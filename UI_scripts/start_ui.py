@@ -1,6 +1,7 @@
 import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
+from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
 import webbrowser
 import requests
 import folium
@@ -12,7 +13,7 @@ cursor = conn.cursor()
 class Monitoringiop(QMainWindow):
     def __init__(self):
         super().__init__()
-        uic.loadUi("UI.html", self)
+        uic.loadUi("UI.ui", self)
 
         self.totalData = {}
         self.data = []
@@ -33,7 +34,6 @@ class Monitoringiop(QMainWindow):
 
         self.downloadFileData.clicked.connect(self.loadTable)
         self.clearBtnTableWidget.clicked.connect(self.clearTableWidget)
-        self.downloadFileData.clicked.connect(self.download)
 
         self.homeBtnDowloadTab.clicked.connect(self.homeGo)
         self.homeBtnVisualTab.clicked.connect(self.homeGo)
@@ -43,15 +43,23 @@ class Monitoringiop(QMainWindow):
 
         # self.QPushButton.clicked.connect(self.ip_a)
         self.pushBtnCheckboxesClear.clicked.connect(self.clear_button)
+        self.clearBtnGraphView.clicked.connect(self.clear_graph)
 
         self.visualizationBtn.clicked.connect(self.get_time)
         self.visualizationBtn.clicked.connect(self.visualization)
-
+        self.downloadFileData.clicked.connect(self.download)
 
 
     # Загрузка
     def download(self):
-        pass
+        db = QSqlDatabase.addDatabase('QSQLITE')
+        db.setDatabaseName('bd13.sqlite')
+        db.open()
+        model = QSqlTableModel(self)
+        model.setTable('stations')
+        model.select()
+
+        self.tableWidget.setModel(model)
 
 
     # Получение временного отрезка
@@ -82,36 +90,39 @@ class Monitoringiop(QMainWindow):
             querries += 1
 
         if self.checkBoxHumidity.isChecked():
-            cursor.execute(f"SELECT humidity FROM stations")
+            cursor.execute(f"SELECT humidity FROM stations WHERE year >= {self.time_start[3]} and month >= {self.time_start[2]} and day >= {self.time_start[1]}")
 
             y_t = [x[0] for x in cursor.fetchmany(querries)]
             x_t = [i for i in range(querries)]
 
             self.graphicsView.plot(x_t, y_t, pen={"color":"g"})
+            self.graphicsView_2.plot(x_t, y_t)
 
         if self.checkBoxPrecipitation.isChecked():
-            cursor.execute(f"SELECT precipit FROM stations")
+            cursor.execute(f"SELECT precipit FROM stations WHERE year >= {self.time_start[3]} and month >= {self.time_start[2]} and day >= {self.time_start[1]}")
 
             y_t = [x[0] for x in cursor.fetchmany(querries)]
             x_t = [i for i in range(querries)]
 
             self.graphicsView.plot(x_t, y_t, pen={"color":"b"})
+            self.graphicsView_3.plot(x_t, y_t)
 
         if self.checkBoxDirectionWind.isChecked():
-            cursor.execute(f"SELECT dirwind FROM stations")
+            cursor.execute(f"SELECT dirwind FROM stations WHERE year >= {self.time_start[3]} and month >= {self.time_start[2]} and day >= {self.time_start[1]}")
 
             y_t = [x[0] for x in cursor.fetchmany(querries)]
             x_t = [i for i in range(querries)]
 
-            self.graphicsView.plot(x_t, y_t)
+            self.graphicsView.plot(x_t, y_t,  pen={"color":"y"})
 
         if self.checkBoxTemperature.isChecked():
-            cursor.execute(f"SELECT temperature FROM stations")
+            cursor.execute(f"SELECT temperature FROM stations WHERE year >= {self.time_start[3]} and month >= {self.time_start[2]} and day >= {self.time_start[1]}")
 
             y_t = [x[0] for x in cursor.fetchmany(querries)]
             x_t = [i for i in range(querries)]
 
             self.graphicsView.plot(x_t, y_t, pen={"color":"r"})
+            self.graphicsView_4.plot(x_t, y_t)
 
 
     # Очистка чекбоксов
@@ -122,9 +133,12 @@ class Monitoringiop(QMainWindow):
         self.checkBoxTemperature.setChecked(False)
 
 
+    def clear_graph(self):
+        self.graphicsView.clear()
+
+
     # Навигация
     def navigate(self):
-        print(self.sender().text(), self.navTab[self.sender().text()][1])
         self.tabWidget.setCurrentIndex(self.navTab[self.sender().text()][1])
 
 
