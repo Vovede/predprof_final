@@ -2,9 +2,9 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
-import webbrowser
-import requests
-import folium
+# import webbrowser
+# import requests
+# import folium
 import sqlite3
 
 conn = sqlite3.connect('../database/bd.db')
@@ -155,40 +155,40 @@ class Monitoringiop(QMainWindow):
 
 
     # Местоположение
-    def ip_a(self):
-        def get_ip():
-            response = requests.get('https://api64.ipify.org?format=json').json()
-            return response["ip"]
-
-        def get_location():
-            ip_address = get_ip()
-            location_data = {
-                "ip": ip_address}
-            n = ''.join([j for i, j in location_data.items()])
-            return n
-
-        def main_1():
-            try:
-                 url = requests.get('https://api64.ipify.org?format=json')
-                 if url:
-                     ip = get_location()
-                     n = []
-                     response = requests.get(f'http://ip-api.com/json/{ip}').json()
-                     for i, j in response.items():
-                         if i == 'lat' or i == 'lon':
-                             n.append(j)
-                     m = folium.Map(location=[n[0], n[1]], zoom_start=15)
-                     folium.Marker([n[0], n[1]], poput='Место 1', tooltip=None).add_to(m)
-                     m.save('weather.html')
-                     webbrowser.open('weather.html')
-
-
-            except requests.ConnectionError as e:
-                print(e)
-
-
-        if __name__ == '__main__':
-            main_1()
+    # def ip_a(self):
+    #     def get_ip():
+    #         response = requests.get('https://api64.ipify.org?format=json').json()
+    #         return response["ip"]
+    #
+    #     def get_location():
+    #         ip_address = get_ip()
+    #         location_data = {
+    #             "ip": ip_address}
+    #         n = ''.join([j for i, j in location_data.items()])
+    #         return n
+    #
+    #     def main_1():
+    #         try:
+    #              url = requests.get('https://api64.ipify.org?format=json')
+    #              if url:
+    #                  ip = get_location()
+    #                  n = []
+    #                  response = requests.get(f'http://ip-api.com/json/{ip}').json()
+    #                  for i, j in response.items():
+    #                      if i == 'lat' or i == 'lon':
+    #                          n.append(j)
+    #                  m = folium.Map(location=[n[0], n[1]], zoom_start=15)
+    #                  folium.Marker([n[0], n[1]], poput='Место 1', tooltip=None).add_to(m)
+    #                  m.save('weather.html')
+    #                  webbrowser.open('weather.html')
+    #
+    #
+    #         except requests.ConnectionError as e:
+    #             print(e)
+    #
+    #
+    #     if __name__ == '__main__':
+    #         main_1()
 
 
 if __name__ == '__main__':
