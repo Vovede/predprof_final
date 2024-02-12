@@ -2,9 +2,6 @@ import sys
 from PyQt5 import uic
 from PyQt5.QtWidgets import *
 from PyQt5.QtSql import QSqlDatabase, QSqlTableModel
-# import webbrowser
-# import requests
-# import folium
 import sqlite3
 
 conn = sqlite3.connect('../database/bd.db')
